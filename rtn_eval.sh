@@ -42,7 +42,7 @@ error() { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }
 resolve_paths() {
     MODEL_PATH="$1"
     MODEL_NAME_BASE="$(basename "${MODEL_PATH}")"
-    QUANT_OUTPUT="$(dirname "${MODEL_PATH}")/${MODEL_NAME_BASE}-RTN-W8A8"
+    QUANT_OUTPUT="${QUANT_OUTPUT_BASE:-$(dirname "${MODEL_PATH}")}/${MODEL_NAME_BASE}-RTN-W8A8"
     RESULTS_DIR="$(dirname "${TASK_DIR}")/results"
     RESULTS_FP16="${RESULTS_DIR}/${MODEL_NAME_BASE}-rtn-fp16"
     RESULTS_W8A8="${RESULTS_DIR}/${MODEL_NAME_BASE}-rtn-w8a8"
@@ -278,6 +278,7 @@ case "${1:-help}" in
         echo "  TP_SIZE               tensor parallel size (default: 1)"
         echo "  RUN_PANGU_SCRIPT      path to run_pangu.sh for pangu models"
         echo "  ASCEND_RT_VISIBLE_DEVICES  NPU devices (default: 0)"
+        echo "  QUANT_OUTPUT_BASE     parent dir for quantized output (default: same as model)"
         echo "  EXTRA_SERVE_ARGS      extra args for vllm serve"
         echo ""
         echo "Examples:"
