@@ -1,0 +1,16 @@
+task: wikitext_local
+dataset_path: __TASK_DIR__/data/wikitext2_doc_level
+output_type: loglikelihood_rolling
+test_split: test
+doc_to_text: ""
+doc_to_target: "{{text}}"
+process_results: !function preprocess_wikitext_local.process_results
+metric_list:
+  - metric: word_perplexity
+    higher_is_better: false
+  - metric: byte_perplexity
+    higher_is_better: false
+  - metric: bits_per_byte
+    higher_is_better: false
+metadata:
+  version: 1.0
