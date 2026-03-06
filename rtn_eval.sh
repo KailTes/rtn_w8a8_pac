@@ -104,7 +104,9 @@ do_serve() {
     [ -z "${1:-}" ] && error "Usage: rtn_eval.sh serve /path/to/model"
     local model_path="$1"
 
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh 2>/dev/null || true
+    for _cann in /usr/local/Ascend/cann-*/set_env.sh /usr/local/Ascend/ascend-toolkit/set_env.sh; do
+        [ -f "$_cann" ] && { source "$_cann" 2>/dev/null; break; }
+    done
 
     # 检测服务是否已在运行
     if curl --noproxy '*' -s "${API_BASE}/v1/models" > /dev/null 2>&1; then
@@ -192,7 +194,9 @@ do_eval() {
     local model_path="$1"
     local output_dir="${2:-$(dirname "${TASK_DIR}")/results/$(basename "${model_path}")}"
 
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh 2>/dev/null || true
+    for _cann in /usr/local/Ascend/cann-*/set_env.sh /usr/local/Ascend/ascend-toolkit/set_env.sh; do
+        [ -f "$_cann" ] && { source "$_cann" 2>/dev/null; break; }
+    done
     fix_yaml_path
 
     # 从服务获取实际注册的模型名

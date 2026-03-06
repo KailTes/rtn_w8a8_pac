@@ -88,6 +88,17 @@ cd rtn_w8a8_pac
 pip install "lm-eval[api]"
 ```
 
+### 注意事项
+
+1. **CANN 环境**：脚本自动查找 `/usr/local/Ascend/cann-*/set_env.sh`，如果不存在则回退到 `ascend-toolkit/set_env.sh`。确保容器内 CANN 版本与主机驱动兼容（如 CANN 8.5.0 + driver 25.3.rc1）。
+
+2. **NPU 设备**：`ASCEND_RT_VISIBLE_DEVICES` 必须与容器实际映射的 `/dev/davinci*` 设备对应。例如容器只挂载了 `/dev/davinci2`，则不设置此变量（脚本默认即可），或显式设为 `2`。查看容器设备映射：
+   ```bash
+   docker inspect <container> --format '{{range .HostConfig.Devices}}{{.PathOnHost}} {{end}}'
+   ```
+
+3. **只读挂载**：模型目录 `/models` 通常只读，量化输出用 `QUANT_OUTPUT_BASE` 指向可写目录。
+
 ### 量化私密模型
 
 ```bash
@@ -163,7 +174,8 @@ int8_weight = round(weight / scale).clamp(-128, 127)
 
 ## 参考结果 (Qwen3-0.6B, WikiText-2)
 
-| 平台 | FP16 | W8A8 RTN | 劣化 |
-|------|------|----------|------|
-| NVIDIA RTX 5090 (torchao) | 60.0424 | 60.9461 | +1.50% |
-| 昇腾 910B2 (omni-infer v1.0.0) | 60.0255 | 61.1840 | +1.93% |
+| 平台 | 量化方式 | FP16 | W8A8 | 劣化 |
+|------|----------|------|------|------|
+| NVIDIA RTX 5090 | torchao | 60.0424 | 60.9461 | +1.50% |
+| 昇腾 910B2 (omni-infer v1.0.0) | llmcompressor | 60.0255 | 61.1840 | +1.93% |
+| 昇腾 910B2 (omni-infer v1.0.0) | **RTN (本仓库)** | (待测) | **60.8364** | (待测) |
